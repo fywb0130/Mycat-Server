@@ -1,78 +1,436 @@
-<?xml version="1.0"?>
 <!DOCTYPE mycat:schema SYSTEM "schema.dtd">
 <mycat:schema xmlns:mycat="http://io.mycat/">
-
-	<schema name="TESTDB" checkSQLschema="false" sqlMaxLimit="100">
-		<!-- auto sharding by id (long) -->
-		<table name="travelrecord" dataNode="dn1,dn2,dn3" rule="auto-sharding-long" />
-
-		<!-- global table is auto cloned to all defined data nodes ,so can join
-			with any table whose sharding node is in the same data node -->
-		<table name="company" primaryKey="ID" type="global" dataNode="dn1,dn2,dn3" />
-		<table name="goods" primaryKey="ID" type="global" dataNode="dn1,dn2" />
-		<!-- random sharding using mod sharind rule -->
-		<table name="hotnews" primaryKey="ID" autoIncrement="true" dataNode="dn1,dn2,dn3"
-			   rule="mod-long" />
-		<!-- <table name="dual" primaryKey="ID" dataNode="dnx,dnoracle2" type="global"
-			needAddLimit="false"/> <table name="worker" primaryKey="ID" dataNode="jdbc_dn1,jdbc_dn2,jdbc_dn3"
-			rule="mod-long" /> -->
-		<table name="employee" primaryKey="ID" dataNode="dn1,dn2"
-			   rule="sharding-by-intfile" />
-		<table name="customer" primaryKey="ID" dataNode="dn1,dn2"
-			   rule="sharding-by-intfile">
-			<childTable name="orders" primaryKey="ID" joinKey="customer_id"
-						parentKey="id">
-				<childTable name="order_items" joinKey="order_id"
-							parentKey="id" />
-			</childTable>
-			<childTable name="customer_addr" primaryKey="ID" joinKey="customer_id"
-						parentKey="id" />
-		</table>
-		<!-- <table name="oc_call" primaryKey="ID" dataNode="dn1$0-743" rule="latest-month-calldate"
-			/> -->
+	<!-- 虚拟数据库 -->
+	<schema name="TRADE" checkSQLschema="true">
+		<table name="app_permission" dataNode="tradeDataNode1" ruleRequired="false" primaryKey="APP_PERMISSION_ID" autoIncrement="true"/>
+		<table name="calendar" dataNode="tradeDataNode1" ruleRequired="false" primaryKey="datelist" autoIncrement="false"/>
+		<table name="customer_order_state" dataNode="tradeDataNode1" ruleRequired="false" primaryKey="CUSTOMER_ORDER_STATE_ID" autoIncrement="true"/>
+		<table name="express" dataNode="tradeDataNode1" ruleRequired="false" primaryKey="id" autoIncrement="true"/>
+		<table name="invoice_item" dataNode="tradeDataNode1" ruleRequired="false" primaryKey="INVOICE_ITEM_ID" autoIncrement="true"/>
+		<table name="invoice_type" dataNode="tradeDataNode1" ruleRequired="false" primaryKey="INVOICE_TYPE_ID" autoIncrement="false"/>
+		<table name="merchant_order_state" dataNode="tradeDataNode1" ruleRequired="false" primaryKey="MERCHANT_ORDER_STATE_ID" autoIncrement="true"/>
+		<table name="hour" dataNode="tradeDataNode1" ruleRequired="false" primaryKey="id" autoIncrement="true"/>
+		<table name="order_delivery" dataNode="tradeDataNode1" ruleRequired="false" primaryKey="ORDER_DELIVERY_ID" autoIncrement="true"/>
+		<table name="order_form" dataNode="tradeDataNode1" ruleRequired="false" primaryKey="ORDER_FORM_ID" autoIncrement="true"/>
+		<table name="order_form_main" dataNode="tradeDataNode1" ruleRequired="false" primaryKey="ORDER_FORM_MAIN_ID" autoIncrement="true"/>
+		<table name="order_invoice_content" dataNode="tradeDataNode1" ruleRequired="false" primaryKey="INVOICE_CONTENT_ID" autoIncrement="true"/>
+		<table name="order_invoice_info" dataNode="tradeDataNode1" ruleRequired="false" primaryKey="ORDER_INVOICE_ID" autoIncrement="true"/>
+		<table name="order_item" dataNode="tradeDataNode1" ruleRequired="false" primaryKey="ORDER_ITEM_ID" autoIncrement="true"/>
+		<table name="order_source" dataNode="tradeDataNode1" ruleRequired="false" primaryKey="ORDER_SOURCE_ID" autoIncrement="true"/>
+		<table name="order_statistics_perday" dataNode="tradeDataNode1" ruleRequired="false"/>
+		<table name="order_status_record" dataNode="tradeDataNode1" ruleRequired="false" primaryKey="ORDER_STATUS_RECORD_ID" autoIncrement="true"/>
+		<table name="party" dataNode="tradeDataNode1" ruleRequired="false" primaryKey="PARTY_ID" autoIncrement="true"/>
+		<table name="refund" dataNode="tradeDataNode1" ruleRequired="false" primaryKey="REFUND_ID" autoIncrement="true"/>
+		<table name="refund_item" dataNode="tradeDataNode1" ruleRequired="false" primaryKey="REFUND_ITEM_ID" autoIncrement="true"/>
+		<table name="refund_money" dataNode="tradeDataNode1" ruleRequired="false" primaryKey="REFUND_MONEY_ID" autoIncrement="true"/>
+		<table name="refund_reason" dataNode="tradeDataNode1" ruleRequired="false" primaryKey="RETURN_REASON_ID" autoIncrement="true"/>
+		<table name="refund_status" dataNode="tradeDataNode1" ruleRequired="false" primaryKey="ORDER_TYPE_ID" autoIncrement="true"/>
+		<table name="shopping_cart" dataNode="tradeDataNode1" ruleRequired="false" primaryKey="SHOPPING_CART_ID" autoIncrement="true"/>
+		<table name="shopping_cart_item" dataNode="tradeDataNode1" ruleRequired="false" primaryKey="SHOPPING_CART_ITEM_ID" autoIncrement="true"/>
+		<table name="tip" dataNode="tradeDataNode1" ruleRequired="false" primaryKey="TIP_ID" autoIncrement="true"/>
+		<table name="user_pay_label" dataNode="tradeDataNode1" ruleRequired="false" primaryKey="USER_LABEL_ID" autoIncrement="true"/>
 	</schema>
-	<!-- <dataNode name="dn1$0-743" dataHost="localhost1" database="db$0-743"
-		/> -->
-	<dataNode name="dn1" dataHost="localhost1" database="db1" />
-	<dataNode name="dn2" dataHost="localhost1" database="db2" />
-	<dataNode name="dn3" dataHost="localhost1" database="db3" />
-	<!--<dataNode name="dn4" dataHost="sequoiadb1" database="SAMPLE" />
-	 <dataNode name="jdbc_dn1" dataHost="jdbchost" database="db1" />
-	<dataNode	name="jdbc_dn2" dataHost="jdbchost" database="db2" />
-	<dataNode name="jdbc_dn3" 	dataHost="jdbchost" database="db3" /> -->
-	<dataHost name="localhost1" maxCon="1000" minCon="10" balance="0"
-			  writeType="0" dbType="mysql" dbDriver="native" switchType="1"  slaveThreshold="100">
+
+	<schema name="ANALYSIS_ENGINE" checkSQLschema="true">
+		<table name="action_record" primaryKey="ACTION_ID" dataNode="analysisDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="aggr_app_relate_browse_statis" primaryKey="ID" dataNode="analysisDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="aggr_app_res_relate_browse_statis" primaryKey="ID" dataNode="analysisDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="aggr_book_relate_browse_statis" primaryKey="ID" dataNode="analysisDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="aggr_book_user_browse_statis" primaryKey="ID" dataNode="analysisDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="aggr_hour_interval_browse_statis" primaryKey="ID" dataNode="analysisDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="aggr_lable_browse_statis" primaryKey="ID" dataNode="analysisDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="aggr_product_browse_statis" primaryKey="ID" dataNode="analysisDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="aggr_product_res_browse_statis" primaryKey="ID" dataNode="analysisDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="aggr_qa_app_product_browse_statis" primaryKey="ID" dataNode="analysisDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="aggr_qa_app_relate_browse_statis" primaryKey="ID" dataNode="analysisDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="aggr_qa_product_browse_statis" primaryKey="ID" dataNode="analysisDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="aggr_qa_relate_browse_statis" primaryKey="ID" dataNode="analysisDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="aggr_system_browse_statis" primaryKey="ID" dataNode="analysisDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="aggr_user_hour_interval_browse_statis" primaryKey="ID" dataNode="analysisDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="aggr_user_lable_browse_statis" primaryKey="ID" dataNode="analysisDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="aggr_user_product_browse_statis" primaryKey="ID" dataNode="analysisDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="aggr_user_signin_statis" primaryKey="ID" dataNode="analysisDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="browse_cache_record" primaryKey="BROWSE_RECORD_ID" dataNode="analysisDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="browse_record" primaryKey="BROWSE_RECORD_ID" dataNode="analysisDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="click_statis" primaryKey="ID" dataNode="analysisDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="day_lable_browse_statis" primaryKey="ID" dataNode="analysisDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="day_product_browse_statis" primaryKey="ID" dataNode="analysisDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="day_system_browse_statis" primaryKey="ID" dataNode="analysisDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="days_book_relate_browse_statis" primaryKey="ID" dataNode="analysisDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="days_qa_relate_browse_statis" primaryKey="ID" dataNode="analysisDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="order_statistics_perday" primaryKey="AGENT_ID" dataNode="analysisDataNode1" ruleRequired = "false" autoIncrement="false"/>
+		<table name="timer_task_record" primaryKey="ID" dataNode="analysisDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="trade_record" primaryKey="TRADE_RECORD_ID" dataNode="analysisDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="type" primaryKey="TYPE_ID" dataNode="analysisDataNode1" ruleRequired = "false" autoIncrement="false"/>
+	</schema>
+
+	<schema name="RESOURCE" checkSQLschema="true">
+		<table name="article" primaryKey="ARTICLE_ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="article_attach" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="article_attach_subcont" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="audit" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="carte" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="carte_ad" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="carte_showcase" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="carte_showcase_product" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="catalog" primaryKey="CATALOG_ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="content" primaryKey="CONTENT_ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="content_type" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="convert_aliyun" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="convert_operation" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="custom_navig" primaryKey="CUSTOM_NAVIG_ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="file_upload_info" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="label" primaryKey="LABEL_ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="label_apply" primaryKey="APPLY_ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="label_link" primaryKey="LINK_ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="label_type" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="pcloud_type" primaryKey="PCLOUD_ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product" primaryKey="PRODUCT_ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_album" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_assoc" primaryKey="PRODUCT_ASSOC_ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_assoc_type" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_audio" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_book" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_channel" primaryKey="PRODUCT_CHANNEL_ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_common" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_discount" primaryKey="DISCOUNT_ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_discount_type" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_ebook" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_free_code" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_group" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_kind" primaryKey="PRODUCT_KIND_ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_kind_ad" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_kind_assoc" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_kind_icon" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_kind_level_open" primaryKey="PRODUCT_KIND_LEVEL_OPEN_ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_label" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_listen" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_match" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_match_option" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_match_option_item" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_match_register" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_match_register_firm_order" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_match_register_item" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_member" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_member_product" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_number" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_number_item" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_pdf" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_preconditions_option" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_preconditions_option_item" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_preconditions_register" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_preconditions_register_item" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_pretest" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_pretest_answer" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_pretest_answer_collected" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_pretest_answer_question" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_pretest_paper" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_pretest_paper_question" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_pretest_question" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_pretest_question_item" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_pretest_question_mode" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_pretest_question_type" primaryKey="TYPE_ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_prorate" primaryKey="PRODUCT_PRORATE_ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_qa" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_qa_assist" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_qa_item" primaryKey="QA_PRODUCT_ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_qs" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_receive_order" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_receive_order_info" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_receive_order_type" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_resource_rar" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_review" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_review_assist" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_sale" primaryKey="PRODUCT_SALE_ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_service_merchant" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_spec_channel" primaryKey="PRODUCT_SPEC_CHANNEL_ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_template" primaryKey="PRODUCT_TEMPLATE_ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_tool" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_tool_user" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_type" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_video" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="product_virtual" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="qrcode_free_channel" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="reader_author_rss" primaryKey="RSS_ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="reader_author_rss_news" primaryKey="NEWS_ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="resource" primaryKey="RESOURCE_ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="resource_catalog" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="resource_content" primaryKey="RESOURCE_CONTENT_ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="resource_content_type" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="resource_type" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="showcase" primaryKey="SHOWCASE_ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="showcase_ad" primaryKey="SHOWCASE_AD_ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="showcase_author" primaryKey="SHOWCASE_AUTHOR_ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="showcase_author_qa" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="showcase_product" primaryKey="SHOWCASE_PRODUCT_ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="specification" primaryKey="SPECIFICATION_ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="style_template_show" primaryKey="ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="style_template_type" primaryKey="TEMPLATE_ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="typography_style" primaryKey="TYPOGRAPHY_STYLE_ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="false"/>
+		<table name="instant_convert" primaryKey="FILE_ID" dataNode="resourceDataNode1" ruleRequired="false" autoIncrement="false"/>
+	</schema>
+
+	<!-- <schema name="GROUP_APP" checkSQLschema="true"> -->
+	<!-- <table name="browse_record" primaryKey="BROWSE_RECORD_ID" dataNode="groupappDataNode1" ruleRequired="false" autoIncrement="true"/> -->
+	<!-- <table name="group_member" primaryKey="MEMBER_ID" dataNode="groupappDataNode1" ruleRequired="false" autoIncrement="true"/> -->
+	<!-- <table name="group_qa_item" primaryKey="QA_ITEM_ID" dataNode="groupappDataNode1" ruleRequired="false" autoIncrement="false"/> -->
+	<!-- <table name="group_topic" primaryKey="TOPIC_ID" dataNode="groupappDataNode1" ruleRequired="false" autoIncrement="true"/> -->
+	<!-- <table name="group_topic_favor" primaryKey="FAVOR_ID" dataNode="groupappDataNode1" ruleRequired="false" autoIncrement="true"/> -->
+	<!-- <table name="group_topic_pic" primaryKey="TOPIC_PIC_ID" dataNode="groupappDataNode1" ruleRequired="false" autoIncrement="true"/> -->
+	<!-- <table name="group_topic_tag" primaryKey="GROUP_TOPIC_TAG_ID" dataNode="groupappDataNode1" ruleRequired="false" autoIncrement="true"/> -->
+	<!-- <table name="group_type" primaryKey="GROUP_TYPE_ID" dataNode="groupappDataNode1" ruleRequired="false" autoIncrement="true"/> -->
+	<!-- <table name="group" primaryKey="APP_ID"  dataNode="groupappDataNode1" ruleRequired="false" autoIncrement="false"/> -->
+	<!-- </schema> -->
+
+	<schema name="USER_CENTER" checkSQLschema="true">
+		<table name="address_location" primaryKey="id" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="adviser" primaryKey="ADVISER_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="agent" primaryKey="AGENT_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="agreement" primaryKey="AGREEMENT_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="agreement_type" primaryKey="AGREEMENT_TYPE_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="area_freight" primaryKey="AREA_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="area_geo" primaryKey="ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="bookcase" primaryKey="BOOKCASE_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="calendar" primaryKey="datelist" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="false"/>
+		<table name="channel" primaryKey="CHANNEL_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="common_question" primaryKey="COMMON_QUESTION_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="contact_mech" primaryKey="CONTACT_MECH_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="false"/>
+		<table name="contact_mech_link" primaryKey="CONTACT_MECH_LINK_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="false"/>
+		<table name="contact_mech_type" primaryKey="CONTACT_MECH_TYPE_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="customer_purchase_records" primaryKey="CUSTOMER_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="delivery_address" primaryKey="DELIVERY_ADDRESS_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="enumeration" primaryKey="ENUM_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="enumeration_type" primaryKey="ENUM_TYPE_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="feedback" primaryKey="FEEDBACK_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="geo" primaryKey="GEO_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="false"/>
+		<table name="geo_assoc" primaryKey="GEO_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="geo_assoc_type" primaryKey="GEO_ASSOC_TYPE_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="geo_point" primaryKey="GEO_POINT_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="geo_type" primaryKey="GEO_TYPE_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="home_page" primaryKey="HOME_PAGE_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="industry" primaryKey="INDUSTRY_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="industry_permission" primaryKey="PERMISSION_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="merchant" primaryKey="MERCHANT_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="merchant_member" primaryKey="MERCHANT_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="merchant_qrcode" primaryKey="ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="merchant_video" primaryKey="video_id" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="merchant_video_purpose" primaryKey="purpose_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="operationlog" primaryKey="ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="party" primaryKey="PARTY_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="party_agreement" primaryKey="PARTY_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="party_classification" primaryKey="PARTY_CLASSIFICATION_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="party_classification_type" primaryKey="PARTY_CLASSIFICATION_TYPE_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="party_info" primaryKey="PARTY_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="party_relationship" primaryKey="PARTY_RELATIONSHIP" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="party_relationship_type" primaryKey="PARTY_RELATIONSHIP_TYPE_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="party_role" primaryKey="PARTY_ROLE_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="party_sys_settings" primaryKey="SETTING_TYPE_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="false"/>
+		<table name="postal_address" primaryKey="POSTAL_ADDRESS_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="role_type" primaryKey="ROLE_TYPE_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="scan_record" primaryKey="SCAN_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="security_group" primaryKey="GROUP_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="security_group_permission" primaryKey="GROUP_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="false"/>
+		<table name="security_permission" primaryKey="PERMISSION_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="service_year" primaryKey="SERVICE_YEAR_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="setting" primaryKey="SETTING_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="subscribe_record" primaryKey="SUBSCRIBE_RECORD_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="sys_settings_type" primaryKey="SETTING_TYPE_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="system" primaryKey="SYSTEM_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="trade_desc" primaryKey="MERCHANT_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="false"/>
+		<table name="user_invitation_code" primaryKey="INVITATION_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="user_label" primaryKey="ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="USER_LOGIN" primaryKey="USER_LOGIN_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="user_login_security_group" primaryKey="USER_LOGIN_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="false"/>
+		<table name="user_login_system" primaryKey="USER_LOGIN_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="false"/>
+		<table name="wechat_user" primaryKey="WECHAT_USER_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="wechat_user_official_accounts" primaryKey="OFFICIAL_ACCOUNTS_ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="false"/>
+		<table name="wechat_reader" primaryKey="ID" dataNode="usercenterDataNode1" ruleRequired = "false" autoIncrement="true"/>
+	</schema>
+
+	<schema name="APP" checkSQLschema="true">
+		<table name="app" primaryKey="APP_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="app_activity" primaryKey="APP_ACTIVITY_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="app_activity_cover" primaryKey="APP_ACTIVITY_COVER_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="app_activity_guide" primaryKey="APP_ACTIVITY_GUIDE_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="app_activity_guide_template" primaryKey="ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="app_activity_key" primaryKey="APP_ACTIVITY_KEY_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="app_activity_user" primaryKey="APP_ACTIVITY_USER_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="app_article" primaryKey="APP_ARTICLE_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="app_case" primaryKey="APP_CASE_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="app_case_item" primaryKey="APP_CASE_ITEM_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="app_catalog" primaryKey="APP_CATALOG_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="app_comment" primaryKey="COMMENT_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="app_comment_pic" primaryKey="COMMENT_PIC_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="app_pay" primaryKey="APP_PAY_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="app_preconditions_option" primaryKey="ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="app_preconditions_option_item" primaryKey="ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="app_preconditions_register" primaryKey="ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="app_preconditions_register_item" primaryKey="ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="app_product" primaryKey="APP_PRODUCT_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="app_record" primaryKey="APP_RECORD_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="app_record_total" primaryKey="APP_RECORD_TOTLA_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="app_resource_file" primaryKey="ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="app_resource_rar" primaryKey="APP_RESOURCE_RAR_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="app_share" primaryKey="APP_SHARE_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="app_templet" primaryKey="APP_TEMPLET_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="app_type" primaryKey="APP_TYPE_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="app_type_permit" primaryKey="APP_TYPE_PERMIT_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="app_voice_msg_video" primaryKey="ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="assist" primaryKey="ASSIST_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="assist_basic" primaryKey="ASSIST_BASIC_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="assist_pay" primaryKey="ASSIST_PAY_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="assist_templet" primaryKey="ASSIST_TEMPLET_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="assist_templet_type" primaryKey="ASSIST_TEMPLET_TYPE_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="book" primaryKey="BOOK_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="book_adviser" primaryKey="BOOK_ADVISER_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="book_app" primaryKey="BOOK_APP_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="book_appeal" primaryKey="BOOK_APPEAL_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="book_defendant" primaryKey="BOOK_DEFENDANT_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="book_product" primaryKey="BOOK_PRODUCT_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="book_resource" primaryKey="BOOK_RESOURCE_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="book_type" primaryKey="BOOK_TYPE_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="push" primaryKey="PUSH_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="push_event" primaryKey="PUSH_EVENT_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="push_event_type" primaryKey="EVENT_TYPE_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="push_event_user" primaryKey="PUSH_EVENT_USER_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="resource" primaryKey="RESOURCE_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="resource_catalog" primaryKey="RESOURCE_CATALOG_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="resource_file" primaryKey="RESOURCE_FILE_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="resource_file_item" primaryKey="RESOURCE_FILE_ITEM_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="resource_type" primaryKey="TYPE_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="user_comment" primaryKey="COMMENT_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="user_comment_item" primaryKey="COMMENT_ITEM_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="user_favorite" primaryKey="FAVORITE_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="user_reward" primaryKey="REWARD_ID" dataNode="appDataNode1" ruleRequired = "false" autoIncrement="true"/>
+	</schema>
+
+	<schema name="CHANNEL" checkSQLschema="true">
+		<table name="account_assoc" primaryKey="ACCOUNT_ASSOC_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="account_setting" primaryKey="ACCOUNT_SETTING_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="book_scan_count" primaryKey="BOOK_SCAN_COUNT_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="channel_templet" primaryKey="CHANNEL_TEMPLET_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="comment" primaryKey="COMMENT_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="comment_bat" primaryKey="COMMENT_BAT_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="comment_pic" primaryKey="COMMENT_PIC_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="comment_quartz" primaryKey="MESSAGE_CONFIGURATION_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="consult" primaryKey="CONSULT_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="favorites" primaryKey="FAVORITES_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="group_push" primaryKey="GROUP_PUSH_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="group_push_counts" primaryKey="GROUP_PUSH_COUNTS_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="group_push_label" primaryKey="GROUP_PUSH_LABEL_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="group_push_result" primaryKey="GROUP_PUSH_RESULT_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="group_push_user_assoc" primaryKey="GROUP_PUSH_USER_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="material_lib" primaryKey="MATERIAL_LIB_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="material_type" primaryKey="MATERIAL_TYPE_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="message" primaryKey="MESSAGE_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="message_from_type" primaryKey="MESSAGE_FROM_TYPE_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="msg_advice_scene_type" primaryKey="SCENE_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="msg_advice_target" primaryKey="TARGET_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="msg_advice_template" primaryKey="TEMPLATE_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="msg_advice_template_content" primaryKey="CONTENT_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="official_menu" primaryKey="OFFICIAL_MENU_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="official_template" primaryKey="OFFICIAL_TEMPLATE_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="qrcode_label" primaryKey="QRCODE_LABEL_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="qrcode_label_copy" primaryKey="QRCODE_LABEL_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="qrcode_login" primaryKey="QRCODE_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="qrcode_scan_count" primaryKey="QRCODE_SCAN_COUNT_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="qrcode_scene" primaryKey="SCENE_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="qrcode_style" primaryKey="QRCODE_STYLE_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="reader_message" primaryKey="READER_MESSAGE_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="response_message" primaryKey="RESPONSE_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="scene_record" primaryKey="SCENE_RECORD_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="send_message" primaryKey="SEND_MESSAGE_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="style_templet" primaryKey="STYLE_TEMPLET_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="templet" primaryKey="TEMPLATE_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="wechat_message" primaryKey="WECHAT_MESSAGE_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+		<table name="wechat_message_attr" primaryKey="WECHAT_MESSAGE_ATTR_ID" dataNode="channelDataNode1" ruleRequired = "false" autoIncrement="true"/>
+	</schema>
+
+	<schema name="MESSAGE" checkSQLschema="true">
+		<table name="message" primaryKey="MESSAGE_ID" dataNode="messageDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="notify" primaryKey="NOTIFY_ID" dataNode="messageDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="notify_config" primaryKey="NOTIFY_CONFIG_ID" dataNode="messageDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="notify_record" primaryKey="RECORD_ID" dataNode="messageDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="notify_template" primaryKey="NOTIFY_TEMPLATE_ID" dataNode="messageDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="notify_type" primaryKey="NOTIFY_TYPE_ID" dataNode="messageDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="peer_review" primaryKey="ID" dataNode="messageDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="questionnair_info" primaryKey="ID" dataNode="messageDataNode1" ruleRequired="false" autoIncrement="true"/>
+	</schema>
+
+	<schema name="SETTLEMENT" checkSQLschema="true">
+		<table name="account" primaryKey="ACCOUNT_ID" dataNode="settlementDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="account_extracting_method" primaryKey="ACCOUNT_EXTRACTING_METHOD_ID" dataNode="settlementDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="account_record" primaryKey="ACCOUNT_RECORD_ID" dataNode="settlementDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="agent_property" primaryKey="AGENT_PROPERTY_ID" dataNode="settlementDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="bank_type" primaryKey="BANK_ID" dataNode="settlementDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="divide_proportion" primaryKey="DIVIDE_PROPORTION_ID" dataNode="settlementDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="extracting_method" primaryKey="EXTRACTING_METHOD_ID" dataNode="settlementDataNode1" ruleRequired="false" autoIncrement="false"/>
+		<table name="miss_record" primaryKey="MISS_RECORD_ID" dataNode="settlementDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="red_packet_record" primaryKey="RED_PACKET_RECORD_ID" dataNode="settlementDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="role" primaryKey="ROLE_ID" dataNode="settlementDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="settlement_error_record" primaryKey="SETTLEMENT_ERROR_ID" dataNode="settlementDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="tax_revenue_record" primaryKey="TAX_REVENUE_RECORD_ID" dataNode="settlementDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="withdraw_request" primaryKey="WITHDRAW_ID" dataNode="settlementDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="withdraw_request_record" primaryKey="WITHDRAW_RECORD_ID" dataNode="settlementDataNode1" ruleRequired="false" autoIncrement="true"/>
+		<table name="calendar" primaryKey="datelist" dataNode="settlementDataNode1" ruleRequired="false" autoIncrement="false"/>
+	</schema>
+
+	<!-- 虚拟数据结点 -->
+	<dataNode name="tradeDataNode1" dataHost="tradeHostCluster1" database="trade"/>
+	<dataNode name="analysisDataNode1" dataHost="analysisHostCluster1" database="anlysisengine"/>
+	<dataNode name="resourceDataNode1" dataHost="resourceHostCluster1" database="resource"/>
+	<!-- <dataNode name="groupappDataNode1" dataHost="groupappHostCluster1" database="groupapp"/> -->
+	<dataNode name="usercenterDataNode1" dataHost="usercenterHostCluster1" database="user"/>
+	<dataNode name="appDataNode1" dataHost="appHostCluster1" database="app"/>
+	<dataNode name="channelDataNode1" dataHost="channelHostCluster1" database="channel"/>
+	<dataNode name="messageDataNode1" dataHost="messageHostCluster1" database="message"/>
+	<dataNode name="settlementDataNode1" dataHost="settlementHostCluster1" database="settlement"/>
+
+	<!-- 物理库集群 -->
+	<dataHost name="tradeHostCluster1" balance="1" maxCon="1000" minCon="10" writeType="0" switchType="1" slaveThreshold="100" dbType="mysql" dbDriver="native">
 		<heartbeat>select user()</heartbeat>
-		<!-- can have multi write hosts -->
-		<writeHost host="hostM1" url="localhost:3306" user="root"
-				   password="123456">
-			<!-- can have multi read hosts -->
-			<readHost host="hostS2" url="192.168.1.200:3306" user="root" password="xxx" />
-		</writeHost>
-		<writeHost host="hostS1" url="localhost:3316" user="root"
-				   password="123456" />
-		<!-- <writeHost host="hostM2" url="localhost:3316" user="root" password="123456"/> -->
+		<writeHost host="masterHost1" url="192.168.89.10:3306" password="root" user="root"/>
+		<writeHost host="slaveHost1" url="192.168.89.100:3306" password="whLg2016." user="whlg110"/>
 	</dataHost>
-	<!--
-		<dataHost name="sequoiadb1" maxCon="1000" minCon="1" balance="0" dbType="sequoiadb" dbDriver="jdbc">
-		<heartbeat> 		</heartbeat>
-		 <writeHost host="hostM1" url="sequoiadb://1426587161.dbaas.sequoialab.net:11920/SAMPLE" user="jifeng" 	password="jifeng"></writeHost>
-		 </dataHost>
+	<dataHost name="analysisHostCluster1" balance="1" maxCon="1000" minCon="10" writeType="0" switchType="1" slaveThreshold="100" dbType="mysql" dbDriver="native">
+		<heartbeat>select user()</heartbeat>
+		<writeHost host="masterHost1" url="192.168.89.10:3306" password="root" user="root"/>
+		<writeHost host="slaveHost1" url="192.168.89.100:3306" password="whLg2016." user="whlg110"/>
+	</dataHost>
+	<dataHost name="resourceHostCluster1" balance="1" maxCon="1000" minCon="10" writeType="0" switchType="1" slaveThreshold="100" dbType="mysql" dbDriver="native">
+		<heartbeat>select user()</heartbeat>
+		<writeHost host="masterHost1" url="192.168.89.10:3306" password="root" user="root"/>
+		<writeHost host="slaveHost1" url="192.168.89.100:3306" password="whLg2016." user="whlg110"/>
+	</dataHost>
+	<!-- <dataHost name="groupappHostCluster1" balance="1" maxCon="1000" minCon="10" writeType="0" switchType="1" slaveThreshold="100" dbType="mysql" dbDriver="native"> -->
+	<!-- <heartbeat>select user()</heartbeat> -->
+	<!-- <writeHost host="masterHost1" url="192.168.89.10:3306" password="root" user="root"/> -->
+	<!-- <writeHost host="slaveHost1" url="192.168.89.100:3306" password="whLg2016." user="whlg110"/> -->
+	<!-- </dataHost>	 -->
+	<dataHost name="usercenterHostCluster1" balance="1" maxCon="1000" minCon="10" writeType="0" switchType="1" slaveThreshold="100" dbType="mysql" dbDriver="native">
+		<heartbeat>select user()</heartbeat>
+		<writeHost host="masterHost1" url="192.168.89.10:3306" password="root" user="root"/>
+		<writeHost host="slaveHost1" url="192.168.89.100:3306" password="whLg2016." user="whlg110"/>
+	</dataHost>
+	<dataHost name="appHostCluster1" balance="1" maxCon="1000" minCon="10" writeType="0" switchType="1" slaveThreshold="100" dbType="mysql" dbDriver="native">
+		<heartbeat>select user()</heartbeat>
+		<writeHost host="masterHost1" url="192.168.89.10:3306" password="root" user="root"/>
+		<writeHost host="slaveHost1" url="192.168.89.100:3306" password="whLg2016." user="whlg110"/>
+	</dataHost>
+	<dataHost name="channelHostCluster1" balance="1" maxCon="1000" minCon="10" writeType="0" switchType="1" slaveThreshold="100" dbType="mysql" dbDriver="native">
+		<heartbeat>select user()</heartbeat>
+		<writeHost host="masterHost1" url="192.168.89.10:3306" password="root" user="root"/>
+		<writeHost host="slaveHost1" url="192.168.89.100:3306" password="whLg2016." user="whlg110"/>
+	</dataHost>
+	<dataHost name="messageHostCluster1" balance="1" maxCon="1000" minCon="10" writeType="0" switchType="1" slaveThreshold="100" dbType="mysql" dbDriver="native">
+		<heartbeat>select user()</heartbeat>
+		<writeHost host="masterHost1" url="192.168.89.10:3306" password="root" user="root"/>
+		<writeHost host="slaveHost1" url="192.168.89.100:3306" password="whLg2016." user="whlg110"/>
+	</dataHost>
+	<dataHost name="settlementHostCluster1" balance="1" maxCon="1000" minCon="10" writeType="0" switchType="1" slaveThreshold="100" dbType="mysql" dbDriver="native">
+		<heartbeat>select user()</heartbeat>
+		<writeHost host="masterHost1" url="192.168.89.10:3306" password="root" user="root"/>
+		<writeHost host="slaveHost1" url="192.168.89.100:3306" password="whLg2016." user="whlg110"/>
+	</dataHost>
 
-	  <dataHost name="oracle1" maxCon="1000" minCon="1" balance="0" writeType="0" 	dbType="oracle" dbDriver="jdbc"> <heartbeat>select 1 from dual</heartbeat>
-		<connectionInitSql>alter session set nls_date_format='yyyy-mm-dd hh24:mi:ss'</connectionInitSql>
-		<writeHost host="hostM1" url="jdbc:oracle:thin:@127.0.0.1:1521:nange" user="base" 	password="123456" > </writeHost> </dataHost>
-
-		<dataHost name="jdbchost" maxCon="1000" 	minCon="1" balance="0" writeType="0" dbType="mongodb" dbDriver="jdbc">
-		<heartbeat>select 	user()</heartbeat>
-		<writeHost host="hostM" url="mongodb://192.168.0.99/test" user="admin" password="123456" ></writeHost> </dataHost>
-
-		<dataHost name="sparksql" maxCon="1000" minCon="1" balance="0" dbType="spark" dbDriver="jdbc">
-		<heartbeat> </heartbeat>
-		 <writeHost host="hostM1" url="jdbc:hive2://feng01:10000" user="jifeng" 	password="jifeng"></writeHost> </dataHost> -->
-
-	<!-- <dataHost name="jdbchost" maxCon="1000" minCon="10" balance="0" dbType="mysql"
-		dbDriver="jdbc"> <heartbeat>select user()</heartbeat> <writeHost host="hostM1"
-		url="jdbc:mysql://localhost:3306" user="root" password="123456"> </writeHost>
-		</dataHost> -->
 </mycat:schema>
